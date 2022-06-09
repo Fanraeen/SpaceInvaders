@@ -1,4 +1,3 @@
-import py_compile
 import pygame as pg
 from player import Player
 import obstacle
