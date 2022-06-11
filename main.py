@@ -35,7 +35,8 @@ class Game:
         self.extra_spawn_time = randint(400, 800)
 
     def create_obstacle(self, x_start, y_start, offset_x) -> None:
-        """Создает загорождение вокруг игрока
+        """
+        создает загорождение вокруг игрока
 
         Args:
             x_start (_type_): начальная координата по x
@@ -52,7 +53,8 @@ class Game:
                     self.blocks.add(block)
     
     def create_multiple_obstacles(self, x_start: int, y_start: int, offset: list) -> None:
-        """Создает загородки вокруг игрока
+        """
+        создает загородки вокруг игрока
 
         Args:
             x_start (int): начальная координата по x
@@ -63,7 +65,8 @@ class Game:
             self.create_obstacle(x_start, y_start, offset_x)
 
     def alien_setup(self, rows: int, cols: int, x_distance: int = 60, y_distance: int = 48, x_offset: int = 70, y_offset: int = 100) -> None:
-        """Создание флота
+        """
+        создает флот кораблей
 
         Args:
             rows (int): количество столбцов
@@ -88,7 +91,10 @@ class Game:
                 self.aliens.add(alien_sprite)
     
     def alien_position_checker(self) -> None:
-        """Проверка положение пришельца, как только один из них касается границы – весь флот меняет направление в другую сторону"""
+        """
+        проверка положение пришельца, как только один из них
+        касается границы – весь флот меняет направление в другую сторону
+        """
         for alien in self.aliens.sprites():
             if alien.rect.right >= screen_width:
                 self.alien_direction = -1
@@ -98,7 +104,8 @@ class Game:
                 self.alien_move_down(1)
     
     def alien_move_down(self, distance: int) -> None:
-        """Смешение пришельца вниз на заданное количество координат
+        """
+        смешение пришельца вниз на заданное количество координат
 
         Args:
             distance (int): дистанция для смещение по y
@@ -108,49 +115,61 @@ class Game:
                 alien.rect.y += distance
     
     def alien_shoot(self) -> None:
-        """Выстрел пришельца по игроку, выбирается случайный пришелец и происходит выстрел"""
+        """
+        выстрел пришельца по игроку, выбирается случайный пришелец и происходит выстрел
+        """
         if self.aliens.sprites():
             random_alien = choice(self.aliens.sprites())
             laser_sprite = Laser(random_alien.rect.center, -5, screen_height)        
             self.aliens_lasers.add(laser_sprite)
 
     def extra_alien_timer(self) -> None:
+        """
+        проверка таймера и спавн корабля extra
+        """
         self.extra_spawn_time -= 1
         if self.extra_spawn_time <= 0:
             self.extra.add(Extra(choice(['right', 'left']), screen_width))
             self.extra_spawn_time = randint(400, 800)
 
     def collsions_checks(self) -> None:
-        # player lasers
+        """
+        проверка всех столкновений в игре
+        """
+        # лазеры игрока
         if self.player.sprite.lasers:
             for laser in self.player.sprite.lasers:
+                # столкновение с блоками защиты
                 if pg.sprite.spritecollide(laser, self.blocks, True):
                     laser.kill()
-                
-                aliens_destroy = pg.sprite.spritecollide(laser, self.aliens, True)
-                if aliens_destroy:
+                # столновение с пришельцами
+                if pg.sprite.spritecollide(laser, self.aliens, True):
                     laser.kill()
 
-        # aliens lasers
+        # лазеры пришельцев
         if self.aliens_lasers:
             for laser in self.aliens_lasers:
+                # столкновение с блоками защиты
                 if pg.sprite.spritecollide(laser, self.blocks, True):
                     laser.kill()
 
+                # столкновение с игроком
                 if pg.sprite.spritecollide(laser, self.player, False):
                     laser.kill() 
+                    # механика здоровья
                     self.lives -= 1
                     print(f'Lives: {self.lives}')
 
+                    # проверка на проигрыш, когда кончаются жизни
                     if self.lives <= 0:
                         print('game over')
                         pg.quit()
                         sys.exit()                       
 
     def run(self) -> None:
-        """ 
-        update all sprites
-        draw groups
+        """
+        обновление всех спрайтов 
+        отрисовка на экране
         """
         self.player.update()
         self.aliens.update(self.alien_direction)
@@ -169,19 +188,30 @@ class Game:
         
 
 if __name__ == '__main__':
+    # инициализация
     pg.init()
+    
+    # параметры разрешения 
     screen_width = 600
     screen_height = 600
     screen = pg.display.set_mode((screen_width, screen_height))
+
+    # счетчик кадров
     clock = pg.time.Clock()
+    
+    # заголовок окна и иконка
     pg.display.set_caption("Space Invaders")
     icon = pg.image.load('sprites/green.png').convert_alpha()
     pg.display.set_icon(icon)
+
+    # объект игры
     game = Game()
 
+    # таймер для выстрела пришельца
     ALIENLASER = pg.USEREVENT + 1
     pg.time.set_timer(ALIENLASER, 800)
 
+    # игрокой цикл
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
