@@ -34,14 +34,14 @@ class Game:
         self.extra = pg.sprite.GroupSingle()
         self.extra_spawn_time = randint(400, 800)
 
-    def create_obstacle(self, x_start, y_start, offset_x) -> None:
+    def create_obstacle(self, x_start: int, y_start: int, offset_x: int) -> None:
         """
         создает загорождение вокруг игрока
 
         Args:
-            x_start (_type_): начальная координата по x
-            y_start (_type_): начальная координата по y
-            offset_x (_type_): смещение
+            x_start (int): начальная координата по x
+            y_start (int): начальная координата по y
+            offset_x (int): смещение
         """
         for row_index, row  in enumerate(self.shape):
             for col_index, col in enumerate(row):
