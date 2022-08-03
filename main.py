@@ -145,6 +145,9 @@ class Game:
                 # столновение с пришельцами
                 if pg.sprite.spritecollide(laser, self.aliens, True):
                     laser.kill()
+                    # если пришельцы заканчивается – спавн следующих
+                    if len(self.aliens) == 0:
+                        self.alien_setup(rows = 6, cols = 8)
 
         # лазеры пришельцев
         if self.aliens_lasers:
