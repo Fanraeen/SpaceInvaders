@@ -15,6 +15,7 @@ class Game:
         self.player = pg.sprite.GroupSingle(player_sprite)
         self.lives = 3
         self.score = 0
+        self.font = pg.font.Font('fonts/Teletactile.ttf', 20) 
 
         # загорождение 
         self.shape = obstacle.shape
@@ -145,9 +146,14 @@ class Game:
                 # столновение с пришельцами
                 if pg.sprite.spritecollide(laser, self.aliens, True):
                     laser.kill()
+
                     # если пришельцы заканчивается – спавн следующих
                     if len(self.aliens) == 0:
                         self.alien_setup(rows = 6, cols = 8)
+
+                # столкновение с extra
+                if pg.sprite.spritecollide(laser, self.extra, True):
+                    laser.kill()
 
         # лазеры пришельцев
         if self.aliens_lasers:
@@ -159,15 +165,39 @@ class Game:
                 # столкновение с игроком
                 if pg.sprite.spritecollide(laser, self.player, False):
                     laser.kill() 
-                    # механика здоровья
                     self.lives -= 1
-                    print(f'Lives: {self.lives}')
+                    
+                    if self.lives <= 0:
+                        pg.quit()
+                        sys.exit()
 
                     # проверка на проигрыш, когда кончаются жизни
                     if self.lives <= 0:
                         print('game over')
                         pg.quit()
-                        sys.exit()                       
+                        sys.exit()
+        # пришельцы
+        if self.aliens:
+            for alien in self.aliens:
+                # столкновение с блоками защиты
+                pg.sprite.spritecollide(alien, self.blocks, True)
+                
+                # столкновение с игроком
+                if pg.sprite.spritecollide(alien, self.player, False):
+                    print('game over')
+                    pg.quit()
+                    sys.exit()
+
+    def display_score(self) -> None:
+        score_surface = self.font.render(f'score: {self.score}', False, 'white')
+        score_rect = score_surface.get_rect(topleft = (10, 10))
+        screen.blit(score_surface, score_rect) 
+
+    def display_lives(self) -> None:
+        lives_surface = self.font.render(f'lives: {self.lives}', False, 'red')
+        lives_x_pos = (screen_width - lives_surface.get_size()[0]) - 10
+        lives_rect = lives_surface.get_rect(topleft = (lives_x_pos, 10))
+        screen.blit(lives_surface, lives_rect) 
 
     def run(self) -> None:
         """
@@ -181,6 +211,7 @@ class Game:
         self.extra_alien_timer()
         self.extra.update()
         self.collsions_checks()
+       
 
         self.player.sprite.lasers.draw(screen)
         self.player.draw(screen)
@@ -188,6 +219,8 @@ class Game:
         self.aliens.draw(screen)
         self.aliens_lasers.draw(screen)
         self.extra.draw(screen)
+        self.display_lives()
+        self.display_score()
         
 
 if __name__ == '__main__':

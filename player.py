@@ -47,9 +47,6 @@ class Player(pg.sprite.Sprite):
             self.shoot_laser()
             self.ready = False
             self.laser_time = pg.time.get_ticks()
-        
-        if keys[pg.K_m]:
-            self.laser_cooldown = 0
 
     def recharge(self) -> None:
         """
