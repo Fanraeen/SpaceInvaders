@@ -7,6 +7,10 @@ class Alien(pg.sprite.Sprite):
         self.image = pg.image.load(f'sprites/{color}.png').convert_alpha()
         self.rect = self.image.get_rect(topleft = (x, y))
         self.screen_width = screen_width
+        
+        if color == 'red': self.value = 100
+        elif color == 'green': self.value = 200
+        else: self.value = 300 
 
 
     def update(self, direction) -> None:

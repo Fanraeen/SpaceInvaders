@@ -144,7 +144,10 @@ class Game:
                 if pg.sprite.spritecollide(laser, self.blocks, True):
                     laser.kill()
                 # столновение с пришельцами
-                if pg.sprite.spritecollide(laser, self.aliens, True):
+                aliens_hit = pg.sprite.spritecollide(laser, self.aliens, True)
+                if aliens_hit:
+                    for alien in aliens_hit:
+                        self.score += alien.value
                     laser.kill()
 
                     # если пришельцы заканчивается – спавн следующих
@@ -154,6 +157,7 @@ class Game:
                 # столкновение с extra
                 if pg.sprite.spritecollide(laser, self.extra, True):
                     laser.kill()
+                    self.score += 500
 
         # лазеры пришельцев
         if self.aliens_lasers:
@@ -221,7 +225,24 @@ class Game:
         self.extra.draw(screen)
         self.display_lives()
         self.display_score()
-        
+
+class CRT:
+	def __init__(self):
+		self.tv = pg.image.load('sprites/tv.png').convert_alpha()
+		self.tv = pg.transform.scale(self.tv,(screen_width,screen_height))
+
+	def create_crt_lines(self):
+		line_height = 3
+		line_amount = int(screen_height / line_height)
+		for line in range(line_amount):
+			y_pos = line * line_height
+			pg.draw.line(self.tv, 'black', (0, y_pos), (screen_width, y_pos), 1)
+
+	def draw(self):
+		self.tv.set_alpha(randint(75,90))
+		self.create_crt_lines()
+		screen.blit(self.tv,(0,0))
+
 
 if __name__ == '__main__':
     # инициализация
@@ -242,6 +263,7 @@ if __name__ == '__main__':
 
     # объект игры
     game = Game()
+    crt = CRT()
 
     # таймер для выстрела пришельца
     ALIENLASER = pg.USEREVENT + 1
@@ -258,6 +280,7 @@ if __name__ == '__main__':
         
         screen.fill((30, 30, 30))
         game.run()
+        crt.draw()
 
         pg.display.flip()
         clock.tick(60)
